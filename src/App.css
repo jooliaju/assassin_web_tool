@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.instruction-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.info-button {
+  background-color: #ffffff;
+  padding: 0.2rem;
+  margin-left: 0.5rem;
+}
+
+.instruction-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.instruction-text {
+  padding-bottom: 1rem;
+}
+
+.number-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #646cff;
+  color: white;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  font-size: 1.5rem;
+}
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.upload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.download-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.download-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 
+.download-button:disabled {
+  cursor: not-allowed;
+} */
+
+.csv-example {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.csv-example img {
+  max-width: 100%;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.csv-example pre {
+  background-color: #1a1a1a;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  text-align: left;
+}
+
+.csv-example p {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.csv-example p:first-of-type {
+  text-align: center;
+}
+
+.csv-example h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
