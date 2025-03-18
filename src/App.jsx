@@ -207,8 +207,8 @@ function App() {
               if you want to verify it.
             </p>
             <p>
-              If you don&apos;t want to know the targets, you don&apos;t need to
-              download it!
+              If you don&apos;t want to know the targets, skip &quot;See
+              Chain&quot;
             </p>
           </div>
 
