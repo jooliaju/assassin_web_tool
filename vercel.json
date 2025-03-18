@@ -3,7 +3,8 @@
   "builds": [
     {
       "src": "backend/app.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": { "runtime": "python3.9" }
     },
     {
       "src": "package.json",
@@ -13,16 +14,20 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/backend/app.py"
+    },
+    {
       "src": "/generate-chain",
-      "dest": "backend/app.py"
+      "dest": "/backend/app.py"
     },
     {
       "src": "/send-emails",
-      "dest": "backend/app.py"
+      "dest": "/backend/app.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/$1"
+      "dest": "/$1"
     }
   ]
 }

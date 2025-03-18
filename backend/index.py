@@ -1,4 +1,5 @@
 from app import app
 
 # This is for Vercel serverless functions
-handler = app 
+def handler(event, context):
+    return app 
