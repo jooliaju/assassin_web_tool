@@ -107,9 +107,8 @@ def check_in():
 
         est = pytz.timezone('America/New_York')
         timestamp = datetime.now(est).isoformat()
-        filename = f"{timestamp}_{name}.jpg"
+        filename = f"{name}_{timestamp}.jpg"
 
-        # Upload to Supabase storage
         file_data = file.read()
         try:
             storage_response = supabase.storage \
@@ -141,7 +140,6 @@ def check_in():
 @app.route('/api/generate-chain', methods=['POST'])
 def generate_chain():
     try:
-        print("Received generate-chain request")
         
         if 'file' not in request.files:
             return jsonify({'error': 'No file uploaded'}), 400

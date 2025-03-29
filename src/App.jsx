@@ -62,22 +62,20 @@ function App() {
     formData.append("host_email", hostEmail);
 
     try {
-      console.log("Sending request to:", `${API_URL}/generate-chain`); // Debug log
       const response = await fetch(`${API_URL}/generate-chain`, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate chain");
-      }
-
       const data = await response.json();
-      setChain(data.chain);
-      alert("Chain generated successfully!");
+
+      if (response.ok) {
+        setChain(data.chain);
+        alert("Chain generated successfully!");
+      } else {
+        alert(data.error || "Failed to generate chain");
+      }
     } catch (error) {
-      console.error("Error:", error); // Debug log
       alert("Error generating chain: " + error.message);
     } finally {
       setLoading(false);
