@@ -72,7 +72,9 @@ function CheckIn() {
           <ul>
             <li>
               <p>
-                submit a selfie by the SYDE Lounge at minimum
+                submit a selfie by the{" "}
+                <span style={{ fontWeight: "bold" }}>SYDE Lounge</span> at
+                minimum
                 <span style={{ color: "#ff6600", marginLeft: "0.4rem" }}>
                   every other day
                 </span>
