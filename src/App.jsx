@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./App.css";
 import CsvModal from "./components/CsvModal";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [hostEmail, setHostEmail] = useState("");
@@ -9,6 +11,7 @@ function App() {
   const [loading_start, setLoading_start] = useState(false);
   const [chain, setChain] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [emailProgress, setEmailProgress] = useState(0);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -59,7 +62,7 @@ function App() {
     formData.append("host_email", hostEmail);
 
     try {
-      const response = await fetch("/generate-chain", {
+      const response = await fetch(`${API_URL}/generate-chain`, {
         method: "POST",
         body: formData,
       });
@@ -116,8 +119,25 @@ function App() {
     }
 
     setLoading_start(true);
+    setEmailProgress(0);
+
+    // Start progress animation
+    const totalTime = 3000;
+    const interval = 50;
+    const steps = totalTime / interval;
+    let currentStep = 0;
+
+    const progressInterval = setInterval(() => {
+      currentStep++;
+      setEmailProgress(Math.min((currentStep / steps) * 100, 95));
+
+      if (currentStep >= steps) {
+        clearInterval(progressInterval);
+      }
+    }, interval);
+
     try {
-      const response = await fetch("/send-emails", {
+      const response = await fetch(`${API_URL}/send-emails`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,15 +150,25 @@ function App() {
 
       const data = await response.json();
 
+      clearInterval(progressInterval);
+      setEmailProgress(100);
+
       if (response.ok) {
-        alert("Emails sent successfully!");
+        setTimeout(() => {
+          alert("Emails sent successfully!");
+        }, 500);
       } else {
         alert(data.error || "Failed to send emails");
       }
     } catch (error) {
+      clearInterval(progressInterval);
+      setEmailProgress(0);
       alert("Error sending emails: " + error.message);
     } finally {
-      setLoading_start(false);
+      setTimeout(() => {
+        setLoading_start(false);
+        setEmailProgress(0);
+      }, 1000);
     }
   };
 
@@ -245,10 +275,19 @@ function App() {
           <button
             onClick={handleSendEmails}
             className="upload-button"
-            disabled={loading || !chain}
+            disabled={loading || !chain || loading_start}
           >
             {loading_start ? "Sending..." : "👋  Start game"}
           </button>
+
+          {loading_start && (
+            <div className="progress-container">
+              <div
+                className="progress-bar"
+                style={{ width: `${emailProgress}%` }}
+              ></div>
+            </div>
+          )}
         </div>
       </div>
     </div>

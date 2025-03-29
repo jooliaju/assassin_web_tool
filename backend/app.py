@@ -9,13 +9,20 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import os
+from supabase import create_client
+import base64
+from datetime import datetime
+import pytz
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5173", "https://*.vercel.app"], 
+        "origins": [
+            "http://localhost:5173",  # Local
+            "https://*.vercel.app",   # Vercel 
+        ],
         "methods": ["GET", "POST"],
         "allow_headers": ["Content-Type"]
     }
@@ -26,6 +33,12 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = os.getenv('SENDER_EMAIL')
 APP_PASSWORD = os.getenv('APP_PASSWORD')
+
+# Initialize Supabase
+supabase = create_client(
+    os.getenv('SUPABASE_URL'),
+    os.getenv('SUPABASE_KEY')
+)
 
 def validate_csv_format(headers):
     required_headers = ["name", "email"]
@@ -41,11 +54,14 @@ def send_target_emails(chain, host_email):
                 msg = MIMEMultipart('alternative')
                 msg['From'] = SENDER_EMAIL
                 msg['To'] = target_info['player_email']
-                msg['Subject'] = 'Target'
+                msg['Subject'] = 'Your SYDE Assassin Target'
+                msg['Reply-To'] = host_email
 
                 html = f"""
-                <p>Hi {player_name}! Assassin is starting, get ready because your target is 
+                <p>Hi {player_name}. Your SYDE assassin mission starts in T-3 days (thursday).</p>
+                <p> You were assigned to assassinate </p>
                 <span style="color: #0066cc; font-weight: bold; font-style: italic;">{target_info['target']}</span></p>
+                <p> May the best assassin win, and the odds be ever in your favour. </p>
                 """
                 part = MIMEText(html, 'html')
                 msg.attach(part)
@@ -218,6 +234,54 @@ def send_emails_only():
 @app.route('/api/test', methods=['GET'])
 def test_api():
     return jsonify({'message': 'API is working!'}), 200
+
+@app.route('/check-in', methods=['POST'])
+def check_in():
+    try:
+        data = request.form
+        name = data.get('name')
+        if not name:
+            return jsonify({'error': 'Name is required'}), 400
+
+        if 'selfie' not in request.files:
+            return jsonify({'error': 'No selfie uploaded'}), 400
+
+        file = request.files['selfie']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+
+        est = pytz.timezone('America/New_York')
+        timestamp = datetime.now(est).isoformat()
+        filename = f"{timestamp}_{name}.jpg"
+
+        # Upload to Supabase storage
+        file_data = file.read()
+        try:
+            storage_response = supabase.storage \
+                .from_('checkins') \
+                .upload(
+                    path=filename,
+                    file=file_data,
+                    file_options={"content-type": "image/jpeg"}
+                )
+            
+            # Create database entry with EST timestamp
+            db_response = supabase.table('checkins').insert({
+                'name': name,
+                'image_url': filename,
+                'submitted_at': timestamp
+            }).execute()
+
+            return jsonify({
+                'message': 'Check-in successful',
+                'data': db_response.data
+            }), 200
+
+        except Exception as upload_error:
+            raise Exception(f"Upload failed: {str(upload_error)}")
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True) 
