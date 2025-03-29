@@ -25,13 +25,11 @@ CORS(app, resources={
     }
 })
 
-# Email config stuff
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = os.getenv('SENDER_EMAIL')
 APP_PASSWORD = os.getenv('APP_PASSWORD')
 
-# Initialize Supabase
 supabase = create_client(
     os.getenv('SUPABASE_URL'),
     os.getenv('SUPABASE_KEY')
@@ -70,7 +68,7 @@ def send_target_emails(chain, host_email):
     except Exception as e:
         return False, "Error sending email: {}".format(e)
 
-def generate_chain(players) -> dict:
+def create_chain(players) -> dict:
     """ 
     shuffles the players and then creates a chain of players.
     """
@@ -82,11 +80,8 @@ def generate_chain(players) -> dict:
     # create the chain with both names and emails
     chain = {}
     for i in range(len(shuffled_players)):
-
         current = shuffled_players[i]
-
         next_player = shuffled_players[(i + 1) % len(shuffled_players)]
-
         chain[current['name']] = {
             'target': next_player['name'],
             'target_email': next_player['email'],
@@ -146,7 +141,7 @@ def check_in():
 @app.route('/api/generate-chain', methods=['POST'])
 def generate_chain():
     try:
-        print("Received generate-chain request") # Debug log
+        print("Received generate-chain request")
         
         if 'file' not in request.files:
             return jsonify({'error': 'No file uploaded'}), 400
@@ -154,7 +149,7 @@ def generate_chain():
         file = request.files['file']
         host_email = request.form.get('host_email')
         
-        print(f"Received file: {file.filename}, host email: {host_email}") # Debug log
+        print(f"Received file: {file.filename}, host email: {host_email}")
         
         if not host_email:
             return jsonify({'error': 'Host email is required'}), 400
@@ -164,30 +159,27 @@ def generate_chain():
         
         if file and file.filename.endswith('.csv'):
             try:
-                # Read the CSV file
                 stream = io.StringIO(file.stream.read().decode("UTF8"))
                 csv_reader = csv.DictReader(stream)
                 
-                # Validate CSV headers
                 headers = csv_reader.fieldnames
-                print(f"CSV headers: {headers}") # Debug log
+                print(f"CSV headers: {headers}")
                 
                 if not validate_csv_format(headers):
                     return jsonify({'error': 'CSV must have "name" and "email" columns'}), 400
                 
-                # Convert to list of dicts
                 players = [{
                     'name': (p['name']),
                     'email': (p['email'])
                 } for p in list(csv_reader)]
                 
-                print(f"Number of players: {len(players)}") # Debug log
+                print(f"Number of players: {len(players)}")
                 
                 if len(players) < 2:
                     return jsonify({'error': 'Need at least 2 players'}), 400
                 
-                # Generate the assassination chain
-                chain = generate_chain(players)
+                # Use create_chain instead of generate_chain
+                chain = create_chain(players)
                 
                 return jsonify({
                     'message': 'Chain generated successfully',
@@ -195,7 +187,7 @@ def generate_chain():
                 }), 200
                 
             except Exception as e:
-                print(f"Error processing CSV: {str(e)}") # Debug log
+                print(f"Error processing CSV: {str(e)}")
                 error_message = e.args[0] if e.args else "Unknown error"
                 if isinstance(error_message, bytes):
                     error_message = error_message.decode('utf-8')
@@ -204,7 +196,7 @@ def generate_chain():
         return jsonify({'error': 'Invalid file type'}), 400
         
     except Exception as e:
-        print(f"Unexpected error: {str(e)}") # Debug log
+        print(f"Unexpected error: {str(e)}")
         return jsonify({
             'error': 'An unexpected error occurred',
             'details': str(e)
