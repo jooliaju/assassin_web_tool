@@ -18,14 +18,6 @@
       "dest": "/backend/app.py"
     },
     {
-      "src": "/generate-chain",
-      "dest": "/backend/app.py"
-    },
-    {
-      "src": "/send-emails",
-      "dest": "/backend/app.py"
-    },
-    {
       "src": "/(.*)",
       "dest": "/$1"
     }

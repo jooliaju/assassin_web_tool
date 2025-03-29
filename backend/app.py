@@ -19,10 +19,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": [
-            "http://localhost:5173",  # Local
-            "https://*.vercel.app",   # Vercel 
-        ],
+        "origins": ["http://localhost:5173", "https://*.vercel.app"], 
         "methods": ["GET", "POST"],
         "allow_headers": ["Content-Type"]
     }
@@ -231,10 +228,6 @@ def send_emails_only():
             error_message = error_message.decode('utf-8')
         return jsonify({'error': f'Error sending emails: {error_message}'}), 400
 
-@app.route('/api/test', methods=['GET'])
-def test_api():
-    return jsonify({'message': 'API is working!'}), 200
-
 @app.route('/api/check-in', methods=['POST'])
 def check_in():
     try:
@@ -358,9 +351,13 @@ def send_emails_only():
             error_message = error_message.decode('utf-8')
         return jsonify({'error': f'Error sending emails: {error_message}'}), 400
 
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    return jsonify({'status': 'ok'}), 200
+
+@app.route('/api', methods=['GET'])
+def index():
+    return jsonify({
+        'message': 'API is running',
+        'timestamp': datetime.now().isoformat()
+    }), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True) 
