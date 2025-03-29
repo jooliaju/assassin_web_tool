@@ -232,5 +232,22 @@ def index():
         'timestamp': datetime.now().isoformat()
     }), 200
 
+@app.route('/api/check-ins', methods=['GET'])
+def get_check_ins():
+    try:
+        est = pytz.timezone('America/New_York')
+        
+        response = supabase.table('checkins') \
+            .select('name, submitted_at') \
+            .order('submitted_at', desc=True) \
+            .execute()
+
+        return jsonify({
+            'checkIns': response.data
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True) 

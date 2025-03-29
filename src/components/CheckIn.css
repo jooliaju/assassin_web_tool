@@ -115,3 +115,12 @@
   transform: none;
   box-shadow: none;
 }
+
+.check-in-list-link {
+  display: inline-block;
+  margin-top: 2rem;
+  color: #8a8dcb;
+  text-decoration: none;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}

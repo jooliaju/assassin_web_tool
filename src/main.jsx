@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App.jsx";
 import CheckIn from "./components/CheckIn.jsx";
+import CheckInList from "./components/CheckInList.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -11,6 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/checkin" element={<CheckIn />} />
+        <Route path="/checkinlist" element={<CheckInList />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./CheckIn.css";
+import CheckInList from "./CheckInList";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -122,6 +124,10 @@ function CheckIn() {
             </div>
           </div>
         )}
+
+        <Link to="/checkinlist" className="check-in-list-link">
+          See who has checked in 👀
+        </Link>
       </div>
     </div>
   );

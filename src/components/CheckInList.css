@@ -1,0 +1,62 @@
+.check-in-list-page {
+  display: flex;
+  justify-content: center;
+  width: 80vw;
+}
+
+.check-in-list {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-row h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.check-in-list h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.check-in-table {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  background: #646cff;
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+}
+
+.table-row {
+  display: flex;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.name-col {
+  flex: 1;
+  text-align: left;
+  padding-right: 1rem;
+}
+
+.time-col {
+  flex: 1;
+  text-align: left;
+}
