@@ -94,7 +94,7 @@ function CheckIn() {
           <input
             type="file"
             accept="image/*"
-            capture="environment"
+            capture="user"
             onChange={handleFileSelect}
             className="hidden"
             id="selfie-input"
