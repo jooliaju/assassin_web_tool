@@ -118,7 +118,7 @@ function CheckIn() {
         {showSuccessModal && (
           <div className="success-modal">
             <div className="success-content">
-              <p>Beautifull, thanks for checking in! 🥷</p>
+              <p>Beautiful, thanks for checking in! 🥷</p>
             </div>
           </div>
         )}
