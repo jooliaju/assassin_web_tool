@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./CheckIn.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -7,6 +7,19 @@ function CheckIn() {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // phone or tablet detection
+    // we want this since selfies are "real time"
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const mobileDevices = /iphone|ipad|android/i;
+      setIsMobile(mobileDevices.test(userAgent));
+    };
+
+    checkMobile();
+  }, []);
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
@@ -38,9 +51,7 @@ function CheckIn() {
       }
 
       setShowSuccessModal(true);
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 3000); // Hide modal after 3 seconds
+      setTimeout(() => setShowSuccessModal(false), 3000);
       setName("");
     } catch (error) {
       console.error("Error:", error);
@@ -53,9 +64,7 @@ function CheckIn() {
   return (
     <div>
       <div>
-        <div>
-          <h1>SYDE Assassin Check-in</h1>
-        </div>
+        <h1>SYDE Assassin Check-in</h1>
 
         <div className="instructions">
           <ul>
@@ -64,10 +73,11 @@ function CheckIn() {
                 submit a selfie in E7 floor 6 at minimum
                 <span style={{ color: "#ff6600", marginLeft: "0.4rem" }}>
                   once every 2 days
-                </span>{" "}
+                </span>
               </p>
             </li>
             <li>failure to do so will result in elimination 😔</li>
+            <li>ty and good luck!</li>
           </ul>
         </div>
 
@@ -88,23 +98,27 @@ function CheckIn() {
             onChange={handleFileSelect}
             className="hidden"
             id="selfie-input"
+            disabled={!isMobile}
           />
 
           <button
             type="button"
             onClick={() => document.getElementById("selfie-input").click()}
-            className="check-in-button"
-            disabled={!name.trim() || loading}
+            className={`check-in-button ${!isMobile ? "disabled" : ""}`}
+            disabled={!name.trim() || loading || !isMobile}
           >
-            {loading ? "Uploading..." : "Take Selfie 📸"}
+            {!isMobile
+              ? "Please use a mobile device 📱"
+              : loading
+              ? "Uploading..."
+              : "selfie time 🤳"}
           </button>
         </form>
 
-        {/* Success Modal */}
         {showSuccessModal && (
           <div className="success-modal">
             <div className="success-content">
-              <p>Nice, thanks for checking in! 🎯</p>
+              <p>Beautifull, thanks for checking in! 🥷</p>
             </div>
           </div>
         )}

@@ -160,3 +160,19 @@
     opacity: 1;
   }
 }
+
+.error-message {
+  color: #ff4444;
+  font-weight: 500;
+}
+
+.check-in-button.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.check-in-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
