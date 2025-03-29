@@ -95,139 +95,6 @@ def generate_chain(players) -> dict:
     
     return chain
 
-@app.route('/generate', methods=['POST'])
-def generate_game():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    host_email = request.form.get('host_email')
-    
-    if not host_email:
-        return jsonify({'error': 'Host email is required'}), 400
-    
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    if file and file.filename.endswith('.csv'):
-        try:
-            # Read the CSV file
-            stream = io.StringIO(file.stream.read().decode("UTF8"))
-            csv_reader = csv.DictReader(stream)
-            
-            # Validate CSV headers
-            headers = csv_reader.fieldnames
-            if not validate_csv_format(headers):
-                return jsonify({'error': 'CSV must have "name" and "email" columns'}), 400
-            
-            # Convert to list of dicts
-            players = [{
-                'name': (p['name']),
-                'email': (p['email'])
-            } for p in list(csv_reader)]
-            
-            if len(players) < 2:
-                return jsonify({'error': 'Need at least 2 players'}), 400
-            
-            # Generate the assassination chain
-            chain = generate_chain(players)
-            
-            # for debugging
-            print(chain)
-            
-            # Send emails to all players
-            success, message = send_target_emails(chain, host_email)
-            if not success:
-                return jsonify({'error': message}), 500
-
-            return jsonify({
-                'message': 'Game generated successfully and emails sent',
-                'chain': "its a secret"
-            }), 200
-            
-        except Exception as e:
-            error_message = e.args[0] if e.args else "Unknown error"
-            if isinstance(error_message, bytes):
-                error_message = error_message.decode('utf-8')
-            return jsonify({'error': f'Error processing request: {error_message}'}), 400
-    
-    return jsonify({'error': 'Invalid file type'}), 400
-
-@app.route('/generate-chain', methods=['POST'])
-def generate_chain_only():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    host_email = request.form.get('host_email')
-    
-    if not host_email:
-        return jsonify({'error': 'Host email is required'}), 400
-    
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    if file and file.filename.endswith('.csv'):
-        try:
-            # Read the CSV file
-            stream = io.StringIO(file.stream.read().decode("UTF8"))
-            csv_reader = csv.DictReader(stream)
-            
-            # Validate CSV headers
-            headers = csv_reader.fieldnames
-            if not validate_csv_format(headers):
-                return jsonify({'error': 'CSV must have "name" and "email" columns'}), 400
-            
-            # Convert to list of dicts
-            players = [{
-                'name': (p['name']),
-                'email': (p['email'])
-            } for p in list(csv_reader)]
-            
-            if len(players) < 2:
-                return jsonify({'error': 'Need at least 2 players'}), 400
-            
-            # Generate the assassination chain
-            chain = generate_chain(players)
-            
-            return jsonify({
-                'message': 'Chain generated successfully',
-                'chain': chain
-            }), 200
-            
-        except Exception as e:
-            error_message = e.args[0] if e.args else "Unknown error"
-            if isinstance(error_message, bytes):
-                error_message = error_message.decode('utf-8')
-            return jsonify({'error': f'Error processing request: {error_message}'}), 400
-    
-    return jsonify({'error': 'Invalid file type'}), 400
-
-@app.route('/send-emails', methods=['POST'])
-def send_emails_only():
-    data = request.json
-    if not data or 'chain' not in data or 'host_email' not in data:
-        return jsonify({'error': 'Missing required data'}), 400
-    
-    chain = data['chain']
-    host_email = data['host_email']
-    
-    try:
-        # Send emails to all players
-        success, message = send_target_emails(chain, host_email)
-        if not success:
-            return jsonify({'error': message}), 500
-
-        return jsonify({
-            'message': 'Emails sent successfully'
-        }), 200
-        
-    except Exception as e:
-        error_message = e.args[0] if e.args else "Unknown error"
-        if isinstance(error_message, bytes):
-            error_message = error_message.decode('utf-8')
-        return jsonify({'error': f'Error sending emails: {error_message}'}), 400
-
 @app.route('/api/check-in', methods=['POST'])
 def check_in():
     try:
@@ -278,56 +145,73 @@ def check_in():
 
 @app.route('/api/generate-chain', methods=['POST'])
 def generate_chain():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    host_email = request.form.get('host_email')
-    
-    if not host_email:
-        return jsonify({'error': 'Host email is required'}), 400
-    
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    if file and file.filename.endswith('.csv'):
-        try:
-            # Read the CSV file
-            stream = io.StringIO(file.stream.read().decode("UTF8"))
-            csv_reader = csv.DictReader(stream)
-            
-            # Validate CSV headers
-            headers = csv_reader.fieldnames
-            if not validate_csv_format(headers):
-                return jsonify({'error': 'CSV must have "name" and "email" columns'}), 400
-            
-            # Convert to list of dicts
-            players = [{
-                'name': (p['name']),
-                'email': (p['email'])
-            } for p in list(csv_reader)]
-            
-            if len(players) < 2:
-                return jsonify({'error': 'Need at least 2 players'}), 400
-            
-            # Generate the assassination chain
-            chain = generate_chain(players)
-            
-            return jsonify({
-                'message': 'Chain generated successfully',
-                'chain': chain
-            }), 200
-            
-        except Exception as e:
-            error_message = e.args[0] if e.args else "Unknown error"
-            if isinstance(error_message, bytes):
-                error_message = error_message.decode('utf-8')
-            return jsonify({'error': f'Error processing request: {error_message}'}), 400
-    
-    return jsonify({'error': 'Invalid file type'}), 400
+    try:
+        print("Received generate-chain request") # Debug log
+        
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['file']
+        host_email = request.form.get('host_email')
+        
+        print(f"Received file: {file.filename}, host email: {host_email}") # Debug log
+        
+        if not host_email:
+            return jsonify({'error': 'Host email is required'}), 400
+        
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        
+        if file and file.filename.endswith('.csv'):
+            try:
+                # Read the CSV file
+                stream = io.StringIO(file.stream.read().decode("UTF8"))
+                csv_reader = csv.DictReader(stream)
+                
+                # Validate CSV headers
+                headers = csv_reader.fieldnames
+                print(f"CSV headers: {headers}") # Debug log
+                
+                if not validate_csv_format(headers):
+                    return jsonify({'error': 'CSV must have "name" and "email" columns'}), 400
+                
+                # Convert to list of dicts
+                players = [{
+                    'name': (p['name']),
+                    'email': (p['email'])
+                } for p in list(csv_reader)]
+                
+                print(f"Number of players: {len(players)}") # Debug log
+                
+                if len(players) < 2:
+                    return jsonify({'error': 'Need at least 2 players'}), 400
+                
+                # Generate the assassination chain
+                chain = generate_chain(players)
+                
+                return jsonify({
+                    'message': 'Chain generated successfully',
+                    'chain': chain
+                }), 200
+                
+            except Exception as e:
+                print(f"Error processing CSV: {str(e)}") # Debug log
+                error_message = e.args[0] if e.args else "Unknown error"
+                if isinstance(error_message, bytes):
+                    error_message = error_message.decode('utf-8')
+                return jsonify({'error': f'Error processing request: {error_message}'}), 400
+        
+        return jsonify({'error': 'Invalid file type'}), 400
+        
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}") # Debug log
+        return jsonify({
+            'error': 'An unexpected error occurred',
+            'details': str(e)
+        }), 500
 
 @app.route('/api/send-emails', methods=['POST'])
-def send_emails_only():
+def send_emails():
     data = request.json
     if not data or 'chain' not in data or 'host_email' not in data:
         return jsonify({'error': 'Missing required data'}), 400
@@ -350,7 +234,6 @@ def send_emails_only():
         if isinstance(error_message, bytes):
             error_message = error_message.decode('utf-8')
         return jsonify({'error': f'Error sending emails: {error_message}'}), 400
-
 
 @app.route('/api', methods=['GET'])
 def index():
