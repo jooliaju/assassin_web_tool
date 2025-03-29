@@ -358,5 +358,9 @@ def send_emails_only():
             error_message = error_message.decode('utf-8')
         return jsonify({'error': f'Error sending emails: {error_message}'}), 400
 
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok'}), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True) 
