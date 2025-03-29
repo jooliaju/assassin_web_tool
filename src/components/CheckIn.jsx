@@ -70,7 +70,7 @@ function CheckIn() {
           <ul>
             <li>
               <p>
-                submit a selfie in E7 floor 6 at minimum
+                submit a selfie from E7 floor 6 at minimum
                 <span style={{ color: "#ff6600", marginLeft: "0.4rem" }}>
                   once every 2 days
                 </span>
