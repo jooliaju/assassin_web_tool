@@ -78,7 +78,7 @@ function CheckIn() {
                 </span>
                 at minimum
                 <span style={{ color: "#ff6600", marginLeft: "0.4rem" }}>
-                  every other day
+                  every day
                 </span>
               </p>
             </li>
