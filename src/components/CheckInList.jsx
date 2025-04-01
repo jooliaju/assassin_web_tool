@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import "./CheckInList.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -7,25 +6,36 @@ const API_URL = import.meta.env.VITE_API_URL;
 function CheckInList() {
   const [checkIns, setCheckIns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     fetchCheckIns();
   }, []);
 
   const fetchCheckIns = async () => {
+    setLoading(true);
     try {
+      console.log("Fetching check-ins from:", `${API_URL}/check-ins`);
       const response = await fetch(`${API_URL}/check-ins`, {
+        method: "GET",
         headers: {
           "Cache-Control": "no-cache",
+          "Content-Type": "application/json",
         },
+        credentials: "same-origin",
       });
+
       if (!response.ok) {
-        throw new Error("Failed to fetch check-ins");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          `Failed to fetch check-ins: ${errorData.error || response.status}`
+        );
       }
       const data = await response.json();
-      setCheckIns(data.checkIns);
+      setCheckIns(data.checkIns || []);
     } catch (error) {
       console.error("Error fetching check-ins:", error);
+      // You might want to show this error to the user
     } finally {
       setLoading(false);
     }
@@ -58,6 +68,7 @@ function CheckInList() {
             <div className="table-header">
               <div className="name-col">Name</div>
               <div className="time-col">Time</div>
+              <div className="image-col">:)</div>
             </div>
             {checkIns.map((checkIn, index) => (
               <div key={index} className="table-row">
@@ -65,8 +76,34 @@ function CheckInList() {
                 <div className="time-col">
                   {formatTime(checkIn.submitted_at)}
                 </div>
+                <div className="image-col">
+                  <button
+                    className="image-button"
+                    onClick={() => setSelectedImage(checkIn.image_url)}
+                  >
+                    🎞️
+                  </button>
+                </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {selectedImage && (
+          <div className="image-modal" onClick={() => setSelectedImage(null)}>
+            <div className="modal-content">
+              <img
+                src={`${API_URL}/image/${selectedImage}`}
+                alt="Check-in selfie"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <button
+                className="close-button"
+                onClick={() => setSelectedImage(null)}
+              >
+                ×
+              </button>
+            </div>
           </div>
         )}
       </div>

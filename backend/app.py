@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import csv
 import io
@@ -21,7 +21,7 @@ CORS(app, resources={
     r"/*": {
         "origins": ["http://localhost:5173", "https://*.vercel.app"], 
         "methods": ["GET", "POST"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type", "Cache-Control"]
     }
 })
 
@@ -238,7 +238,7 @@ def get_check_ins():
         est = pytz.timezone('America/New_York')
         
         response = supabase.table('checkins') \
-            .select('name, submitted_at') \
+            .select('name, submitted_at, image_url') \
             .order('submitted_at', desc=True) \
             .execute()
 
@@ -247,7 +247,24 @@ def get_check_ins():
         }), 200
 
     except Exception as e:
+        print(f"Error getting check-ins: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+# Add a new endpoint to serve images
+@app.route('/api/image/<path:filename>')
+def serve_image(filename):
+    try:
+        # Get the image data from Supabase storage
+        response = supabase.storage \
+            .from_('checkins') \
+            .download(filename)
+        
+        return send_file(
+            io.BytesIO(response),
+            mimetype='image/jpeg'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True) 
