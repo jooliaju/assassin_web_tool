@@ -90,20 +90,13 @@ function CheckInList() {
         )}
 
         {selectedImage && (
-          <div className="image-modal" onClick={() => setSelectedImage(null)}>
-            <div className="modal-content">
-              <img
-                src={`${API_URL}/image/${selectedImage}`}
-                alt="Check-in selfie"
-                onClick={(e) => e.stopPropagation()}
-              />
-              <button
-                className="close-button"
-                onClick={() => setSelectedImage(null)}
-              >
-                ×
-              </button>
-            </div>
+          <div className="overlay" onClick={() => setSelectedImage(null)}>
+            <img
+              src={`${API_URL}/image/${selectedImage}`}
+              alt="Check-in selfie"
+              className="modal-image"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
         )}
       </div>
